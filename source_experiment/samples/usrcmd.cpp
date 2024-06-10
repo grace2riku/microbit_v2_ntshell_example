@@ -45,6 +45,7 @@ static int usrcmd_ntopt_callback(int argc, char **argv, void *extobj);
 static int usrcmd_help(int argc, char **argv);
 static int usrcmd_info(int argc, char **argv);
 static int usrcmd_setPixelValue(int argc, char **argv);
+static int usrcmd_getPixelValue(int argc, char **argv);
 
 typedef struct {
     char *cmd;
@@ -56,6 +57,7 @@ static const cmd_table_t cmdlist[] = {
     { "help", "This is a description text string for help command.", usrcmd_help },
     { "info", "This is a description text string for info command.", usrcmd_info },
     { "setPixelValue", "This is a description text string for setPixelValue command.", usrcmd_setPixelValue },
+    { "getPixelValue", "This is a description text string for getPixelValue command.", usrcmd_getPixelValue },
 };
 
 int usrcmd_execute(const char *text)
@@ -139,6 +141,40 @@ static int usrcmd_setPixelValue(int argc, char **argv) {
     }
 
     uBit.display.image.setPixelValue(x, y, (uint8_t)brightness_level);
+
+    return 0;
+}
+
+
+static int usrcmd_getPixelValue(int argc, char **argv) {
+    int16_t x, y;
+    int brightness_level;
+
+    if (argc != 3) {
+        uart_puts("getPixelValue 0 0\r\n");
+        return -1;
+    }
+
+    x = atoi(argv[1]);
+    if (x < 0 || x > 4) {
+        uart_puts("Error: led x 0-4.\r\n");
+        return -1;
+    }
+
+    y = atoi(argv[2]);
+    if (y < 0 || y > 4) {
+        uart_puts("Error: led y 0-4.\r\n");
+        return -1;
+    }
+
+    brightness_level = uBit.display.image.getPixelValue(x, y);
+
+    ManagedString s1("brightness_level = ");
+    ManagedString s2(brightness_level);
+    ManagedString s3("\r\n");
+    ManagedString display_msg = s1 + s2 + s3;
+
+    uart_puts(display_msg);
 
     return 0;
 }
