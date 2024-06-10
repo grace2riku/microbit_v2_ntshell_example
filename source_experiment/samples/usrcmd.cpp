@@ -46,6 +46,9 @@ static int usrcmd_help(int argc, char **argv);
 static int usrcmd_info(int argc, char **argv);
 static int usrcmd_setPixelValue(int argc, char **argv);
 static int usrcmd_getPixelValue(int argc, char **argv);
+static int usrcmd_display_scroll(int argc, char **argv);
+static int usrcmd_button_isPressed(int argc, char **argv);
+static int usrcmd_getTemperature(int argc, char **argv);
 
 typedef struct {
     char *cmd;
@@ -58,6 +61,9 @@ static const cmd_table_t cmdlist[] = {
     { "info", "This is a description text string for info command.", usrcmd_info },
     { "setPixelValue", "This is a description text string for setPixelValue command.", usrcmd_setPixelValue },
     { "getPixelValue", "This is a description text string for getPixelValue command.", usrcmd_getPixelValue },
+    { "display.scroll", "This is a description text string for display.scroll command.", usrcmd_display_scroll },
+    { "button.isPressed", "This is a description text string for button.isPressed command.", usrcmd_button_isPressed },
+    { "getTemperature", "This is a description text string for getTemperature command.", usrcmd_getTemperature },
 };
 
 int usrcmd_execute(const char *text)
@@ -178,3 +184,61 @@ static int usrcmd_getPixelValue(int argc, char **argv) {
 
     return 0;
 }
+
+
+static int usrcmd_display_scroll(int argc, char **argv) {
+    if (argc != 2) {
+        uart_puts("display.scroll scroll_massage\r\n");
+        return -1;
+    }
+
+    uBit.display.scroll(argv[1]);
+
+    return 0;
+}
+
+
+static int usrcmd_button_isPressed(int argc, char **argv) {
+    ManagedString hedder("button ");
+    ManagedString button_status;
+    ManagedString output_msg;
+
+    // button A
+    if (uBit.buttonA.isPressed())
+        button_status = "A pressed!";
+    else
+        button_status = "A not pressed.";
+
+    output_msg = hedder + button_status + "\r\n";
+    uart_puts(output_msg);
+
+    // button B
+    if (uBit.buttonB.isPressed())
+        button_status = "B pressed!";
+    else
+        button_status = "B not pressed.";
+
+    output_msg = hedder + button_status + "\r\n";
+    uart_puts(output_msg);
+
+    // logo
+    if (uBit.logo.isPressed())
+        button_status = "logo touch!";
+    else
+        button_status = "logo not touch.";
+
+    output_msg = button_status + "\r\n";
+    uart_puts(output_msg);
+
+    return 0;
+}
+
+static int usrcmd_getTemperature(int argc, char **argv) {
+    ManagedString temp_str(uBit.thermometer.getTemperature());
+    ManagedString output_msg = "temperature = " + temp_str + " (degrees celsius)\r\n";
+
+    uart_puts(output_msg);
+
+    return 0;
+}
+
