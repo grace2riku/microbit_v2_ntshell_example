@@ -1,4 +1,4 @@
-microbit-v2-samples/
+microbit-v2-samples/CMakeLists.txt
 
 # Prerequisites
 *.d
