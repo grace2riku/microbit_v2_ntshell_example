@@ -9,10 +9,10 @@ int main() {
     uBit.init();
     
     // LED点滅開始
-//    start_flashLed();
+    start_flashLed();
 
     start_ntshell_task();
 
-    // main タスクは何か他の作業をするか、または単に終了しないように待機します
+    // main タスクは何か他の作業をするか、または単に終了しないように待機する
     release_fiber();
 }
